@@ -15,7 +15,27 @@ Description: {scene['description']}
 Frame 1 of {total_frames}
 The ASCII art should be exactly {ascii_art_height} lines tall and {frame_width} characters wide.
 Create a detailed initial scene that can be animated in subsequent frames.
-Do not include any caption or text at the bottom of the ASCII art. Only return the frame, nothing else."""
+Do not include any caption or text at the bottom of the ASCII art. Only return the frame, nothing else.
+
+This is an example of good ASCII ART:
+
+          .........      @@@@@    @@@@@     ..........
+          .........     @     @  @     @     .........
+          .........        @@@   @     @      ........
+           .......       @@      @     @       ........
+           ......       @@@@@@@   @@@@@  th     .......
+           .....      -----------------------    ......
+            ...         C  E  N  T  U  R  Y       .....
+            ..        -----------------------       ...
+            ..        @@@@@ @@@@@ @   @ @@@@@        ..
+            ==          @   @      @ @    @          ==
+          __||__        @   @@@@    @     @        __||__
+         |      |       @   @      @ @    @       |      |
+_________|______|_____  @   @@@@@ @   @   @  _____|______|_________
+
+
+
+"""
     else:
         return f"""Generate the next frame of an ASCII art animation based on the following:
 
