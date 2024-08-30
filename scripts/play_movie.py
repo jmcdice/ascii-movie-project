@@ -29,7 +29,7 @@ def read_frame(file_path):
     with open(file_path, 'r') as f:
         return f.read()
 
-def play_movie(movie_dir, frame_delay=0.4):
+def play_movie(movie_dir, frame_delay=0.6):
     # Load movie information
     with open(os.path.join(movie_dir, 'story.json'), 'r') as f:
         story_data = json.load(f)
@@ -48,8 +48,8 @@ def play_movie(movie_dir, frame_delay=0.4):
             
             clear_screen()
             display_info(f"Scene {scene_index + 1}: {scene_data['name']}")
-            print(f"\n{wrap_text('Description: ' + scene_data['description'])}")
-            print(f"\n{wrap_text('Caption: ' + scene_data['caption'])}\n")
+            print(f"\n{wrap_text(scene_data['description'])}")
+            print(f"\n{wrap_text(scene_data['caption'])}\n")
             input("Press Enter to start the scene...")
             
             scene_path = os.path.join(movie_dir, scene_dir)
@@ -92,7 +92,7 @@ def select_movie(movies):
         except ValueError:
             print("Invalid input. Please enter a number or 'q' to quit.")
 
-def main(frame_delay=0.1):
+def main(frame_delay=0.6):
     data_dir = os.path.join(project_root, 'data', 'movies')
     movies = list_movies(data_dir)
     
@@ -116,7 +116,7 @@ def main(frame_delay=0.1):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Play an ASCII movie")
-    parser.add_argument("--delay", type=float, default=0.1, help="Delay between frames in seconds (default: 0.4)")
+    parser.add_argument("--delay", type=float, default=0.6, help="Delay between frames in seconds (default: 0.6)")
     args = parser.parse_args()
 
     try:
