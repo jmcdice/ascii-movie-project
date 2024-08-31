@@ -30,7 +30,7 @@ def read_frame(file_path):
     with open(file_path, 'r') as f:
         return f.read()
 
-def play_movie(movie_dir, frame_delay=0.6, frame_height=13, frame_width=68):
+def play_movie(movie_dir, frame_delay=0.6, frame_height=15, frame_width=70):
     # Load movie information
     story_file = os.path.join(movie_dir, 'story.json')
     if not os.path.exists(story_file):
@@ -40,8 +40,8 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=13, frame_width=68):
         story_data = json.load(f)
     
     clear_screen()
-    display_info(f"Movie: {story_data['title']}")
-    print(f"\n{wrap_text('Synopsis: ' + story_data['synopsis'])}\n")
+    display_info(f"Movie: {story_data['title']}", width=frame_width)
+    print(f"\n{wrap_text('Synopsis: ' + story_data['synopsis'], width=frame_width)}\n")
     input("Press Enter to start the movie...")
 
     scene_dirs = sorted([d for d in os.listdir(movie_dir) if os.path.isdir(os.path.join(movie_dir, d)) and d.startswith('scene_')])
@@ -52,11 +52,42 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=13, frame_width=68):
             scene_data = story_data['scenes'][scene_index]
             
             clear_screen()
-            display_info(f"Scene {scene_number}: {scene_data['name']}")
-            print(f"\n{wrap_text(scene_data['description'])}")
-            print(f"\n{wrap_text(scene_data['caption'])}\n")
-            input("Press Enter to start the scene...")
             
+            # Prepare the content for the scene intro
+            scene_title = f"Scene {scene_number}: {scene_data['name']}"
+            description = wrap_text(scene_data['description'], width=frame_width)
+            caption = wrap_text(scene_data['caption'], width=frame_width)
+            
+            # Create the scene intro frame
+            adjusted_intro = ['+' + '-' * frame_width + '+']  # Top border
+            adjusted_intro.append('|' + scene_title.center(frame_width)[:frame_width] + '|')  # Centered Scene title
+            adjusted_intro.append('|' + '-' * frame_width + '|')  # Border line under the scene title
+            
+            # Calculate how many lines the description and caption take
+            scene_intro_lines = description.split('\n') + [''] + caption.split('\n')
+            total_lines = len(scene_intro_lines)
+            
+            # Calculate padding to center the description/caption
+            padding_top = (frame_height - total_lines - 3) // 2  # -3 for title, border, and bottom padding
+            padding_bottom = frame_height - total_lines - padding_top - 3
+            
+            # Add top padding
+            for _ in range(padding_top):
+                adjusted_intro.append('|' + ' ' * frame_width + '|')
+            
+            # Add the description and caption
+            for line in scene_intro_lines:
+                adjusted_intro.append('|' + line.center(frame_width)[:frame_width] + '|')
+            
+            # Add bottom padding
+            for _ in range(padding_bottom):
+                adjusted_intro.append('|' + ' ' * frame_width + '|')
+            
+            adjusted_intro.append('+' + '-' * frame_width + '+')  # Bottom border
+            
+            print('\n'.join(adjusted_intro))
+            input("Press Enter to start the scene...")
+
             scene_path = os.path.join(movie_dir, scene_dir)
             frame_files = sorted([f for f in os.listdir(scene_path) if f.endswith('.txt') and f.startswith(f'scene_{scene_number:02d}_frame_')])
             
@@ -64,15 +95,22 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=13, frame_width=68):
                 clear_screen()
                 frame_content = read_frame(os.path.join(scene_path, frame_file))
                 
-                # Ensure consistent frame size
+                # Ensure consistent frame size with border and dialogue at the bottom
                 frame_lines = frame_content.split('\n')
-                adjusted_frame = []
-                for i in range(frame_height):
-                    if i < len(frame_lines):
-                        line = frame_lines[i].ljust(frame_width)[:frame_width]
-                    else:
-                        line = ' ' * frame_width
-                    adjusted_frame.append(line)
+                adjusted_frame = ['+' + '-' * (frame_width) + '+']  # Top border
+                
+                # Calculate padding above the dialogue
+                padding_lines = frame_height - len(frame_lines)
+                
+                # Add padding lines
+                for _ in range(padding_lines):
+                    adjusted_frame.append('|' + ' ' * frame_width + '|')
+                
+                # Add the actual content
+                for line in frame_lines:
+                    adjusted_frame.append('|' + line.ljust(frame_width)[:frame_width] + '|')
+                
+                adjusted_frame.append('+' + '-' * (frame_width) + '+')  # Bottom border
                 
                 print('\n'.join(adjusted_frame))
                 time.sleep(frame_delay)
@@ -80,22 +118,22 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=13, frame_width=68):
         # Display goodbye frame
         clear_screen()
         goodbye_frame = [
-            "=" * frame_width,
-            "",
-            "End of Movie".center(frame_width),
-            "",
-            f"Thank you for watching".center(frame_width),
-            f"{story_data['title']}".center(frame_width),
-            "",
-            "=" * frame_width,
+            "+" + "-" * frame_width + "+",
+            "|" + " " * frame_width + "|",
+            "|" + "End of Movie".center(frame_width) + "|",
+            "|" + " " * frame_width + "|",
+            "|" + f"Thank you for watching".center(frame_width) + "|",
+            "|" + f"{story_data['title']}".center(frame_width) + "|",
+            "|" + " " * frame_width + "|",
+            "+" + "-" * frame_width + "+",
         ]
         
         # Pad the goodbye frame to match frame_height
-        while len(goodbye_frame) < frame_height:
-            if len(goodbye_frame) == frame_height - 1:
-                goodbye_frame.append("=" * frame_width)
+        while len(goodbye_frame) < frame_height + 2:  # +2 for top and bottom border
+            if len(goodbye_frame) == frame_height + 1:
+                goodbye_frame.insert(-1, "|" + "-" * frame_width + "|")  # Adjust before the bottom border
             else:
-                goodbye_frame.insert(-1, " " * frame_width)
+                goodbye_frame.insert(-2, "|" + " " * frame_width + "|")
         
         print('\n'.join(goodbye_frame))
         
@@ -143,12 +181,12 @@ def main(frame_delay=0.6):
     
     try:
         play_movie(movie_dir, frame_delay)
-    #except KeyboardInterrupt:
-        #log_progress("Movie playback interrupted.")
+    except KeyboardInterrupt:
+        log_progress("Movie playback interrupted.")
     except FileNotFoundError as e:
         error_exit(f"Error: {str(e)}")
     
-    log_progress("Movie playback complete.")
+    #log_progress("Movie playback complete.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Play an ASCII movie")
