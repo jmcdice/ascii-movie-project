@@ -119,7 +119,7 @@ def generate_frames(story_data, output_dir, use_local_llm=False, model="gpt-4o-m
 
             log_progress(f"Preview of frame {frame_number}:")
             log_progress('\n'.join(frame.split('\n')[:6]) + "\n...")  # Print first 6 lines as a preview
-            time.sleep(1)  # Add a small delay to avoid overwhelming the API
+            # time.sleep(1)  # Add a small delay to avoid overwhelming the API
 
         log_progress(f"Completed Scene {scene_number}: {scene['name']}")
 
