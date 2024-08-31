@@ -1,7 +1,10 @@
+# scripts/generate_movie.py
+
 import os
 import sys
 import json
 import argparse
+from dotenv import load_dotenv
 
 # Add the project root directory to the Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,7 +13,20 @@ sys.path.insert(0, project_root)
 from src.story_generator import generate_story, save_story
 from src.frame_generator import generate_frames
 from src.utils import create_movie_directory, log_progress, error_exit
-from src.llm_config import create_llm_client
+from src.llm_config import create_llm_client, get_llm_completion
+
+# Load environment variables
+load_dotenv()
+
+def get_model_name(provider):
+    if provider == 'openai':
+        return os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+    elif provider == 'anthropic':
+        return os.getenv('ANTHROPIC_MODEL', 'claude-3-sonnet-20240229')
+    elif provider == 'ollama':
+        return os.getenv('OLLAMA_MODEL', 'llama3.1')
+    else:
+        raise ValueError(f"Unsupported provider: {provider}")
 
 def main(provider='ollama', resume=False, topic=None):
     # Set up directories
@@ -18,15 +34,11 @@ def main(provider='ollama', resume=False, topic=None):
     debug_dir = os.path.join(data_dir, 'debug_output')
     os.makedirs(debug_dir, exist_ok=True)
 
-    if provider == 'openai':
-        model = "gpt-4"
-    elif provider == 'anthropic':
-        model = "claude-3-sonnet-20240229"
-    else:  # ollama
-        model = "qwen2:7b"
-    
-    base_url = "http://localhost:11434/v1" if provider == 'ollama' else None
-    client = create_llm_client(provider=provider, use_local_llm=(provider == 'ollama'), base_url=base_url)
+    model = get_model_name(provider)
+    client = create_llm_client(provider)
+
+    # Log the provider and model
+    log_progress(f"Using LLM provider: {provider}, Model: {model}")
 
     if resume:
         # Find the most recent movie directory
@@ -45,7 +57,7 @@ def main(provider='ollama', resume=False, topic=None):
         log_progress(f"Resuming movie generation for: {story_data['title']}")
     else:
         log_progress("Generating new story...")
-        story_data = generate_story(debug_dir, client=client, model=model, topic=topic)
+        story_data = generate_story(debug_dir, client=client, model=model, provider=provider, topic=topic)
         if not story_data:
             return  # Error message already printed in generate_story
         
@@ -53,7 +65,7 @@ def main(provider='ollama', resume=False, topic=None):
         save_story(story_data, movie_dir)
     
     log_progress("Generating frames...")
-    generate_frames(story_data, movie_dir, client=client, model=model, resume=resume)
+    generate_frames(story_data, movie_dir, client=client, model=model, provider=provider, resume=resume)
     log_progress("All frames generated.")
     
     log_progress(f"Movie generation complete. The movie is saved in: {movie_dir}")

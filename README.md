@@ -77,11 +77,13 @@ Examples:
 
 Using Anthropic's Claude:
 ```
+  export ANTHROPIC_API_KEY='<key>'
   python scripts/generate_movie.py --provider anthropic --topic "Space exploration"
 ```
 
 Using OpenAI's GPT model:
 ```
+  export OPENAI_API_KEY='<key>'
   python scripts/generate_movie.py --provider openai --topic "Underwater adventure"
 ```
 
