@@ -3,7 +3,7 @@
 import os
 import json
 import re
-from .llm_config import create_llm_client, get_llm_completion
+from .llm_config import get_llm_completion
 from .utils import log_progress, error_exit
 
 def create_story_template():
@@ -16,23 +16,19 @@ def create_story_template():
                 "name": "",
                 "description": "",
                 "caption": "",
-                "num_frames": 10  # Default number of frames per scene
+                "num_frames": 30  # Default number of frames per scene
             }
-        ] * 8  # Template for up to 8 scenes
+        ] * 4 
     }
 
 def create_story_prompt(template):
     prompt = f"""Create a short movie script by filling out this JSON template:
 {json.dumps(template, indent=2)}
 Guidelines:
-
 IMPORTANT: Only return valid JSON, nothing else.
-
 1. Provide a catchy title."""
-
     if template['topic']:
         prompt += f"\n2. Choose a topic and incorporate it into the story. The topic is: {template['topic']}"
-
     prompt += """
 2. Write a brief synopsis in 2-3 sentences.
 3. Create 5-8 scenes. For each scene:
@@ -43,16 +39,13 @@ IMPORTANT: Only return valid JSON, nothing else.
 Fill out the JSON template with your creative story. 
 Ensure all fields are filled and the JSON structure is maintained.
 """
-
     return prompt
 
-def generate_story(output_dir, use_local_llm=False, model="gpt-4o-mini", base_url=None, topic=None):
-    client = create_llm_client(use_local_llm, base_url)
+def generate_story(output_dir, client, model, topic=None):
     template = create_story_template()
     if topic:
         template['topic'] = topic  # Set the topic if provided
     prompt = create_story_prompt(template)
-
     try:
         messages = [{"role": "user", "content": prompt}]
         content = get_llm_completion(client, model, messages)
@@ -99,11 +92,15 @@ def save_story(story_data, output_dir):
         error_exit(f"Failed to save story: {str(e)}")
 
 if __name__ == "__main__":
+    from .llm_config import create_llm_client
+    
     output_dir = "data/debug_output"
     os.makedirs(output_dir, exist_ok=True)
-    story = generate_story(output_dir, topic="Space Exploration")
+    
+    client = create_llm_client(provider='ollama', use_local_llm=True, base_url="http://localhost:11434/v1")
+    model = "llama2"
+    
+    story = generate_story(output_dir, client, model, topic="Space Exploration")
     if story:
         save_story(story, output_dir)
         print(json.dumps(story, indent=2))
-
-

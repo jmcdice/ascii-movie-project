@@ -17,6 +17,31 @@ The ASCII Movie Generator and Player is a Python-based project that creates and 
 
 ## Installation
 
+```console
+  .
+  ├── LICENSE
+  ├── README.md
+  ├── data
+  │   └── movies
+  │       ├── cosmic_voyage
+  │       ├── crash_landing_a_robots_journey
+  │       ├── debug_output
+  │       ├── journey_beyond_the_stars
+  │       ├── magic_awakening
+  │       └── the_quest_for_the_shattered_ring
+  ├── requirements.txt
+  ├── scripts
+  │   ├── generate_movie.py
+  │   └── play_movie.py
+  └── src
+      ├── __init__.py
+      ├── frame_generator.py
+      ├── llm_config.py
+      ├── movie_player.py
+      ├── story_generator.py
+      └── utils.py
+```
+
 1. Clone the repository:
 ```
    git clone https://github.com/jmcdice/ascii-movie-project.git
@@ -31,6 +56,7 @@ The ASCII Movie Generator and Player is a Python-based project that creates and 
    pip install -r requirements.txt
 ```
 
+
 3. Set up your OpenAI API key as an environment variable (if using OpenAI):
 ```
    export OPENAI_API_KEY='your-api-key-here'
@@ -41,74 +67,50 @@ The ASCII Movie Generator and Player is a Python-based project that creates and 
 
 ## Usage
 
-### Generating and Playing a Movie
+### Generating and Playing Movies
 
-Run the main script to generate and play a new ASCII movie:
+To generate a new ASCII art movie, use the generate_movie.py script. You can specify the LLM provider and an optional topic for the movie.
+Examples:
 
+Using Anthropic's Claude:
 ```
-   python scripts/generate_and_play_movie.py
-```
-
-By default, this uses Ollama (local LLM). To use OpenAI instead:
-
-```
-   python scripts/generate_and_play_movie.py --openai
+  python scripts/generate_movie.py --provider anthropic --topic "Space exploration"
 ```
 
-You can also provide a topic to start with:
-
+Using OpenAI's GPT model:
 ```
-   python scripts/generate_and_play_movie.py --topic "Time Travel" --openai
-```
-
-This script will:
-1. Generate a new story using AI
-2. Create ASCII art frames for each scene
-3. Play the movie in your terminal
-
-### Playing an Existing Movie
-
-To play an existing ASCII movie:
-
-```
-   python scripts/play_movie.py
+  python scripts/generate_movie.py --provider openai --topic "Underwater adventure"
 ```
 
-This will show a list of available movies and prompt you to choose one. You can also specify a custom frame delay:
-
+Using local Ollama model:
 ```
-   python scripts/play_movie.py --delay 0.2
-```
-
-### Resuming Movie Generation
-
-To resume the most recent movie generation:
-
-```
-   python scripts/generate_and_play_movie.py --resume
+  python scripts/generate_movie.py --provider ollama --topic "Time travel"
 ```
 
-## Project Structure
+### Playing a Movie
+
+To play a generated ASCII art movie, use the play_movie.py script. This script will list available movies and allow you to choose one to play.
 
 ```
-   ascii_movie_project/
-   ├── README.md
-   ├── requirements.txt
-   ├── data/
-   │   └── movies/
-   │       ├── debug_output/
-   │       ├── movie_name_1/
-   │       └── movie_name_2/
-   ├── scripts/
-   │   ├── generate_and_play_movie.py
-   │   └── play_movie.py
-   └── src/
-       ├── __init__.py
-       ├── frame_generator.py
-       ├── llm_config.py
-       ├── movie_player.py
-       ├── story_generator.py
-       └── utils.py
+  python scripts/play_movie.py
+```
+
+Example output:
+```
+  Available movies (most recent first):
+  
+  1. journey_beyond_the_stars
+  2. cosmic_voyage
+  3. crash_landing_a_robots_journey
+  4. magic_awakening
+  5. the_quest_for_the_shattered_ring
+  
+  Enter the number of the movie you want to play (or 'q' to quit):
+```
+
+You can also adjust the frame delay and scene delay:
+```
+  python scripts/play_movie.py --delay 0.5 --scene-delay 3
 ```
 
 ## Contributing

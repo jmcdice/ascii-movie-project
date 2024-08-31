@@ -1,8 +1,5 @@
-# scripts/generate_and_play_movie.py
-
 import os
 import sys
-import time
 import json
 import argparse
 
@@ -12,18 +9,25 @@ sys.path.insert(0, project_root)
 
 from src.story_generator import generate_story, save_story
 from src.frame_generator import generate_frames
-from src.movie_player import play_movie
 from src.utils import create_movie_directory, log_progress, error_exit
+from src.llm_config import create_llm_client
 
-def main(use_openai=False, resume=False, topic=None):
+def main(provider='ollama', resume=False, topic=None):
     # Set up directories
     data_dir = os.path.join(project_root, 'data', 'movies')
     debug_dir = os.path.join(data_dir, 'debug_output')
     os.makedirs(debug_dir, exist_ok=True)
+
+    if provider == 'openai':
+        model = "gpt-4"
+    elif provider == 'anthropic':
+        model = "claude-3-sonnet-20240229"
+    else:  # ollama
+        model = "qwen2:7b"
     
-    model = "gpt-4o-mini" if use_openai else "gemma2"
-    base_url = None if use_openai else "http://localhost:11434/v1"
-    
+    base_url = "http://localhost:11434/v1" if provider == 'ollama' else None
+    client = create_llm_client(provider=provider, use_local_llm=(provider == 'ollama'), base_url=base_url)
+
     if resume:
         # Find the most recent movie directory
         movie_dirs = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d)) and d != 'debug_output']
@@ -41,7 +45,7 @@ def main(use_openai=False, resume=False, topic=None):
         log_progress(f"Resuming movie generation for: {story_data['title']}")
     else:
         log_progress("Generating new story...")
-        story_data = generate_story(debug_dir, use_local_llm=not use_openai, model=model, base_url=base_url, topic=topic)
+        story_data = generate_story(debug_dir, client=client, model=model, topic=topic)
         if not story_data:
             return  # Error message already printed in generate_story
         
@@ -49,28 +53,20 @@ def main(use_openai=False, resume=False, topic=None):
         save_story(story_data, movie_dir)
     
     log_progress("Generating frames...")
-    generate_frames(story_data, movie_dir, use_local_llm=not use_openai, model=model, base_url=base_url, resume=resume)
+    generate_frames(story_data, movie_dir, client=client, model=model, resume=resume)
     log_progress("All frames generated.")
     
-    log_progress("Starting movie playback...")
-    time.sleep(2)  # Give a moment for the user to prepare
-    
-    try:
-        play_movie(movie_dir)
-    except KeyboardInterrupt:
-        log_progress("Movie playback interrupted.")
-    
-    log_progress("Movie generation and playback complete.")
+    log_progress(f"Movie generation complete. The movie is saved in: {movie_dir}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate and play ASCII movie")
-    parser.add_argument("--openai", action="store_true", help="Use OpenAI instead of local Ollama")
+    parser = argparse.ArgumentParser(description="Generate ASCII movie")
+    parser.add_argument("--provider", choices=['ollama', 'openai', 'anthropic'], default='ollama', 
+                        help="Choose the LLM provider (default: ollama)")
     parser.add_argument("--resume", action="store_true", help="Resume the most recent movie generation")
     parser.add_argument("--topic", type=str, help="Specify a topic for the story generation")
     args = parser.parse_args()
 
     try:
-        main(use_openai=args.openai, resume=args.resume, topic=args.topic)
+        main(provider=args.provider, resume=args.resume, topic=args.topic)
     except Exception as e:
         error_exit(f"An unexpected error occurred: {str(e)}")
-

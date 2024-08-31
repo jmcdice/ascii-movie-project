@@ -38,6 +38,7 @@ def play_movie(movie_dir, frame_delay=0.4):
     first_scene_dir = os.path.join(movie_dir, scene_dirs[0])
     first_frame_file = sorted([f for f in os.listdir(first_scene_dir) if f.endswith('.txt')])[0]
     frame_width = get_frame_width(os.path.join(first_scene_dir, first_frame_file))
+    frame_width = 68
 
     clear_screen()
     display_info(f"Movie: {story_data['title']}", frame_width)
