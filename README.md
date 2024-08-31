@@ -1,7 +1,10 @@
-# ASCII Movie Generator and Player
+# Ascii Theater
 
 ## Overview
-The ASCII Movie Generator and Player is a Python-based project that creates and displays animated ASCII art movies. It uses AI to generate a story, converts the story into ASCII art frames, and then plays these frames in a command-line interface, creating a unique animated movie experience.
+Ascii Theater is a Python-based project that creates and displays animated ASCII art movies. It uses AI to generate a story, converts the story into ASCII art frames, and then plays these frames in a command-line interface, creating a unique animated movie experience.
+
+<img src="./images/scene_window.png" alt="Alt text" width="300" height="200">
+<img src="./images/ascii_screnshot.png" alt="Alt text" width="300" height="200">
 
 ## Features
 - AI-powered story and scene generation using OpenAI or local LLM (Ollama)

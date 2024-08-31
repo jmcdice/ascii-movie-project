@@ -67,6 +67,11 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=15, frame_width=70):
             scene_intro_lines = description.split('\n') + [''] + caption.split('\n')
             total_lines = len(scene_intro_lines)
             
+            # Truncate lines if they exceed the frame height
+            if total_lines > (frame_height - 3):  # -3 for title, border, and padding
+                scene_intro_lines = scene_intro_lines[:(frame_height - 3)]
+                total_lines = len(scene_intro_lines)
+            
             # Calculate padding to center the description/caption
             padding_top = (frame_height - total_lines - 3) // 2  # -3 for title, border, and bottom padding
             padding_bottom = frame_height - total_lines - padding_top - 3
@@ -97,7 +102,12 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=15, frame_width=70):
                 
                 # Ensure consistent frame size with border and dialogue at the bottom
                 frame_lines = frame_content.split('\n')
-                adjusted_frame = ['+' + '-' * (frame_width) + '+']  # Top border
+                
+                # Truncate lines if they exceed the frame height
+                if len(frame_lines) > frame_height:
+                    frame_lines = frame_lines[:frame_height]
+                
+                adjusted_frame = ['+' + '-' * frame_width + '+']  # Top border
                 
                 # Calculate padding above the dialogue
                 padding_lines = frame_height - len(frame_lines)
@@ -110,7 +120,7 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=15, frame_width=70):
                 for line in frame_lines:
                     adjusted_frame.append('|' + line.ljust(frame_width)[:frame_width] + '|')
                 
-                adjusted_frame.append('+' + '-' * (frame_width) + '+')  # Bottom border
+                adjusted_frame.append('+' + '-' * frame_width + '+')  # Bottom border
                 
                 print('\n'.join(adjusted_frame))
                 time.sleep(frame_delay)
@@ -120,7 +130,7 @@ def play_movie(movie_dir, frame_delay=0.6, frame_height=15, frame_width=70):
         goodbye_frame = [
             "+" + "-" * frame_width + "+",
             "|" + " " * frame_width + "|",
-            "|" + "End of Movie".center(frame_width) + "|",
+            "|" + "The End".center(frame_width) + "|",
             "|" + " " * frame_width + "|",
             "|" + f"Thank you for watching".center(frame_width) + "|",
             "|" + f"{story_data['title']}".center(frame_width) + "|",
@@ -147,7 +157,8 @@ def list_movies(data_dir):
     return sorted(movies, key=lambda x: os.path.getmtime(os.path.join(data_dir, x)), reverse=True)
 
 def select_movie(movies):
-    print("\nAvailable movies (most recent first):")
+    clear_screen()
+    print("\nAvailable movies (most recent first):\n")
     for i, movie in enumerate(movies, 1):
         print(f"{i}. {movie}")
     
