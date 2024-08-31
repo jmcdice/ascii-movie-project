@@ -59,10 +59,9 @@ Ascii Theater is a Python-based project that creates and displays animated ASCII
    pip install -r requirements.txt
 ```
 
-
-3. Set up your OpenAI API key as an environment variable (if using OpenAI):
+3. Set up your LLM config's, copy the example env and fill it in
 ```
-   export OPENAI_API_KEY='your-api-key-here'
+   cp .env_example .env.sh
 ```
 
 4. Install Ollama (if using local LLM):
@@ -77,13 +76,11 @@ Examples:
 
 Using Anthropic's Claude:
 ```
-  export ANTHROPIC_API_KEY='<key>'
   python scripts/generate_movie.py --provider anthropic --topic "Space exploration"
 ```
 
 Using OpenAI's GPT model:
 ```
-  export OPENAI_API_KEY='<key>'
   python scripts/generate_movie.py --provider openai --topic "Underwater adventure"
 ```
 
