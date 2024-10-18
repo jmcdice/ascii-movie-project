@@ -1,0 +1,31 @@
+{
+  "title": "Lost City of Atlantis",
+  "topic": "Underwater adventure",
+  "synopsis": "A team of explorers discovers a hidden entrance to the mythical city of Atlantis, embarking on a treacherous underwater journey filled with ancient mysteries and unexpected dangers.",
+  "scenes": [
+    {
+      "name": "Discovery of the Entrance",
+      "description": "The explorers locate the submerged entrance to Atlantis using ancient maps and advanced technology.",
+      "caption": "The shimmering gateway to Atlantis reveals itself amidst the deep blue sea.",
+      "num_frames": 15
+    },
+    {
+      "name": "Journey Through the Coral Labyrinth",
+      "description": "The team navigates through a complex maze of vibrant coral reefs, encountering exotic marine life.",
+      "caption": "A vibrant coral maze teems with life as the team delves deeper into the unknown.",
+      "num_frames": 15
+    },
+    {
+      "name": "Encounter with the Guardians",
+      "description": "The explorers face mythical guardians protecting the secrets of Atlantis, leading to a tense standoff.",
+      "caption": "Majestic guardians emerge from the shadows, challenging the explorers' resolve.",
+      "num_frames": 15
+    },
+    {
+      "name": "Unveiling the Lost Treasures",
+      "description": "After overcoming obstacles, the team discovers the ancient treasures and the true legacy of Atlantis.",
+      "caption": "The lost treasures of Atlantis glitter, revealing the city's glorious past.",
+      "num_frames": 15
+    }
+  ]
+}
